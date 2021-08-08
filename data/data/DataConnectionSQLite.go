@@ -58,19 +58,19 @@ func (x *DataConnectionSQLite) Query(a string) *DataTable {
 	return result;
 }
 
-func (x *DataConnectionSQLite) GetTableNames() []string {
+func (x DataConnectionSQLite) GetTableNames() []string {
 	var result []string;
 	if x.connect() {
 		results := x.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY 1 DESC");
-		for i := range results.GetRows() {
-			result = append(result, results.GetRows()[i].GetColumns()[0].GetValue());
+		for i := range results.Rows() {
+			result = append(result, results.Rows()[i].Columns()[0].Value());
 		}
         x.disconnect();
     }
     return result;
 }
 
-func (x *DataConnectionSQLite) GetColumnNames(a string) []string {
+func (x DataConnectionSQLite) GetColumnNames(a string) []string {
 	var result []string;
 	if x.connect() {
 		var statement *C.sqlite3_stmt;
@@ -94,9 +94,9 @@ func (x *DataConnectionSQLite) RunQuery(a string) bool {
      }
 	return true;
 }
-func (x *DataConnectionSQLite) GetConnectionString() string { return x.path; }
-func (x *DataConnectionSQLite) GetUsername() string { return ""; }
-func (x *DataConnectionSQLite) GetPassword() string { return ""; }
+func (x DataConnectionSQLite) ConnectionString() string { return x.path; }
+func (x DataConnectionSQLite) Username() string { return ""; }
+func (x DataConnectionSQLite) Password() string { return ""; }
 func (x *DataConnectionSQLite) SetUsername(a string) {}
 func (x *DataConnectionSQLite) SetPassword(a string) {}
 func (x *DataConnectionSQLite) SetConnectionString(a string) { x.path = a; }

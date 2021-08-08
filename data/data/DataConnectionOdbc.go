@@ -17,15 +17,15 @@ import (
 var MAX_COLUMN_LENGTH = 1024;
 
 type DataConnectionOdbc struct {
-	hEnv             C.SQLHENV
-	hHandler         C.SQLHDBC
-	ConnectionString string
-	Username         string
-	Password         string
-	IsConnected      bool
+	hEnv                     C.SQLHENV
+	hHandler                 C.SQLHDBC
+	DatabaseConnectionString string
+	DatabaseUsername         string
+	DatabasePassword         string
+	IsConnected              bool
 }
 func (x *DataConnectionOdbc) check(a C.SQLRETURN, b string) {
-	if a != C.SQL_SUCCESS && a != C.SQL_SUCCESS_WITH_INFO && a != 100  && b != "Get data" {
+	if a != C.SQL_SUCCESS && a != C.SQL_SUCCESS_WITH_INFO && a != 100  && b != " data" {
 		panic(fmt.Sprintf("%s (%v)", b, a));
 	}
 }
@@ -86,12 +86,12 @@ func (x *DataConnectionOdbc) RunQuery(a string) bool {
 	}
     return result;
 }
-func (x *DataConnectionOdbc) GetColumnNames(a string) []string {
+func (x DataConnectionOdbc) GetColumnNames(a string) []string {
 	var result []string;
 	var statement C.SQLHSTMT;
     var cols C.SQLSMALLINT;
     if x.connect() {
-        x.check(C.SQLAllocHandle(C.SQL_HANDLE_STMT, x.hHandler, &statement), "Allocate statement (GetColumns)");
+        x.check(C.SQLAllocHandle(C.SQL_HANDLE_STMT, x.hHandler, &statement), "Allocate statement (Columns)");
         x.check(C.SQLExecDirect(statement, (*C.uchar)(common.ToConstStr(a)), C.SQL_NTS), "Execute");
         x.check(C.SQLNumResultCols(statement, &cols), "Column count");
         for i := 0; i < int(cols); i++ {
@@ -109,7 +109,7 @@ func (x *DataConnectionOdbc) GetColumnNames(a string) []string {
     }
 	return result;
 }
-func (x *DataConnectionOdbc) GetTableNames() []string {
+func (x DataConnectionOdbc) GetTableNames() []string {
 	var result []string;
 	return result;
 }
@@ -118,7 +118,7 @@ func (x *DataConnectionOdbc) connect() bool {
 	x.check(C.SQLAllocHandle(C.SQL_HANDLE_ENV, nil, &x.hEnv), "Allocation of environment");
     x.check(C.SQLSetEnvAttr(x.hEnv, C.SQL_ATTR_ODBC_VERSION, C.SQLPOINTER(uintptr(C.SQL_OV_ODBC2)), 0), "Set version");
     x.check(C.SQLAllocHandle(C.SQL_HANDLE_DBC, x.hEnv, &x.hHandler), "Allocation of connection");
-	x.check(C.SQLDriverConnect(x.hHandler, nil, (*C.SQLCHAR)((*C.uchar)(common.ToConstStr(x.ConnectionString))), C.SQL_NTS, nil, 0, nil, C.SQL_DRIVER_COMPLETE), "Connect");
+	x.check(C.SQLDriverConnect(x.hHandler, nil, (*C.SQLCHAR)((*C.uchar)(common.ToConstStr(x.DatabaseConnectionString))), C.SQL_NTS, nil, 0, nil, C.SQL_DRIVER_COMPLETE), "Connect");
     C.SQLSetConnectAttr(x.hHandler, C.SQL_ATTR_AUTOCOMMIT, C.SQLPOINTER(uintptr(1)), 0);
 	x.IsConnected = true;
 	return true;
@@ -129,13 +129,13 @@ func (x *DataConnectionOdbc) disconnect() {
     x.check(C.SQLFreeHandle(C.SQL_HANDLE_ENV, x.hEnv), "Release environment");
     x.IsConnected = false;
 }
-func (x *DataConnectionOdbc) GetConnectionString() string { return x.ConnectionString; }
-func (x *DataConnectionOdbc) GetUsername() string { return x.Username; }
-func (x *DataConnectionOdbc) GetPassword() string { return x.Password; }
-func (x *DataConnectionOdbc) SetUsername(a string) { x.Username = a; }
-func (x *DataConnectionOdbc) SetPassword(a string) { x.Password = a; }
+func (x DataConnectionOdbc) ConnectionString() string { return x.DatabaseConnectionString; }
+func (x DataConnectionOdbc) Username() string { return x.DatabaseUsername; }
+func (x DataConnectionOdbc) Password() string { return x.DatabasePassword; }
+func (x *DataConnectionOdbc) SetUsername(a string) { x.DatabaseUsername = a; }
+func (x *DataConnectionOdbc) SetPassword(a string) { x.DatabasePassword = a; }
 func (x *DataConnectionOdbc) SetConnectionString(a string) {
-	x.ConnectionString = a;
-	if string(x.ConnectionString[len(x.ConnectionString) - 1]) != ";" { x.ConnectionString += ";"; }
-    x.ConnectionString += fmt.Sprintf("UID=%s;PWD=%s;", x.Username, x.Password);
+	x.DatabaseConnectionString = a;
+	if string(x.DatabaseConnectionString[len(x.DatabaseConnectionString) - 1]) != ";" { x.DatabaseConnectionString += ";"; }
+    x.DatabaseConnectionString += fmt.Sprintf("UID=%s;PWD=%s;", x.DatabaseUsername, x.DatabasePassword);
 }

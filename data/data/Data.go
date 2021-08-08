@@ -12,7 +12,7 @@ func CreateConnection(x string, a string, b string) DataConnection {
 	if strings.Replace(x, "sqlite:", "", -1) != x {
 		return &DataConnectionSQLite{path: strings.Replace(x, "sqlite:", "", -1)};
 	} else if strings.Replace(x, "odbc:", "", -1) != x {
-		return &DataConnectionOdbc{ConnectionString: strings.Replace(x, "odbc:", "", -1), Username: a, Password: b};
+		return &DataConnectionOdbc{DatabaseConnectionString: strings.Replace(x, "odbc:", "", -1), DatabaseUsername: a, DatabasePassword: b};
 	}
 	return &EmptyConnection{};
 }
@@ -23,9 +23,9 @@ type DataColumn struct {
 	columnValue string
 	columnType  string
 }
-func (x *DataColumn) GetName() string { return x.columnName; }
-func (x *DataColumn) GetValue() string { return x.columnValue; }
-func (x *DataColumn) GetType() string { return x.columnType; }
+func (x DataColumn) Name() string { return x.columnName; }
+func (x DataColumn) Value() string { return x.columnValue; }
+func (x DataColumn) Type() string { return x.columnType; }
 func (x *DataColumn) SetName(y string) { x.columnName = y; }
 func (x *DataColumn) SetValue(y string) { x.columnValue = y; }
 func (x *DataColumn) SetType(y string) { x.columnType = y; }
@@ -35,25 +35,25 @@ func (x *DataColumn) SetType(y string) { x.columnType = y; }
 type DataRow struct {
 	columns []*DataColumn
 }
-func (x *DataRow) GetColumns() []*DataColumn { return x.columns; }
-func (x *DataRow) GetColumn(name string) *DataColumn {
+func (x DataRow) Columns() []*DataColumn { return x.columns; }
+func (x DataRow) Column(name string) *DataColumn {
 	for i := 0; i < len(x.columns); i++ {
-		if x.columns[i].GetName() == name {
+		if x.columns[i].Name() == name {
 			return x.columns[i];
 		}
 	}
 	return &DataColumn{};
 }
-func (x *DataRow) Contains(name string) bool {
+func (x DataRow) Contains(name string) bool {
 	for i := 0; i < len(x.columns); i++ {
-        if x.columns[i].GetName() == name {
+        if x.columns[i].Name() == name {
             return true;
 		}
 	}
 	return false;
 }
 func (x *DataRow) AddColumn(y *DataColumn) {
-	if !x.Contains(y.GetName()) {
+	if !x.Contains(y.Name()) {
 		x.columns = append(x.columns, y);
 	}
 }
@@ -63,7 +63,7 @@ func (x *DataRow) AddColumn(y *DataColumn) {
 type DataTable struct {
     rows []*DataRow
 }
-func (x *DataTable) GetRows() []*DataRow { return x.rows; }
+func (x DataTable) Rows() []*DataRow { return x.rows; }
 func (x *DataTable) AddRow(y *DataRow) {
 	x.rows = append(x.rows, y);
 }
@@ -71,9 +71,9 @@ func (x *DataTable) AddRow(y *DataRow) {
 
 // IDataConnection
 type DataConnection interface {
-	GetConnectionString()    string
-	GetUsername()            string
-	GetPassword()            string
+	ConnectionString()    string
+	Username()            string
+	Password()            string
 	Query(a string)          *DataTable
 	GetTableNames()          []string
 	GetColumnNames(a string) []string
@@ -91,11 +91,11 @@ type DataConnection interface {
 type EmptyConnection struct { }
 func (x *EmptyConnection) Query(a string) *DataTable { return &DataTable{}; }
 func (x *EmptyConnection) RunQuery(a string) bool { return true; }
-func (x *EmptyConnection) GetColumnNames(a string) []string { var result []string; return result;  }
-func (x *EmptyConnection) GetConnectionString() string { return "" }
-func (x *EmptyConnection) GetUsername() string { return ""; }
-func (x *EmptyConnection) GetPassword() string { return ""; }
-func (x *EmptyConnection) GetTableNames() []string { var result []string; return result; }
+func (x EmptyConnection) GetColumnNames(a string) []string { var result []string; return result;  }
+func (x *EmptyConnection) ConnectionString() string { return "" }
+func (x EmptyConnection) Username() string { return ""; }
+func (x EmptyConnection) Password() string { return ""; }
+func (x EmptyConnection) GetTableNames() []string { var result []string; return result; }
 func (x *EmptyConnection) SetConnectionString(a string) {}
 func (x *EmptyConnection) SetUsername(a string) {}
 func (x *EmptyConnection) SetPassword(a string) {}
