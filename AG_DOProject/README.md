@@ -153,7 +153,7 @@ The following referenced were used to help build some of the aspects of this too
 ## Retrospective
 * The main thing I would change is the implementation of the API.  For scaling purposes, I would use gRPC instead of REST to take advantage of the performance improvements in HTTP/2.
 * I would also add a SQLite database file to hold the repository manifests, so that instead of walking the file system, I can retrieve everything at once with a lightwight query.
-* Design and implementation time was about 7 days, which I'm not really thrilled with as if I would have continued the rest of the process, this would have show insufficient experience.
+* Design and implementation time was about 7 days, which I'm not really thrilled with as if I would have continued the rest of the process, this would have shown insufficient experience.
 * I would have probably scoped the project better as I included other items (Chief recipe, bootstrap, etc) that may not have mattered.  I included these to show my range of skills.  This would have most likely helped with implementation time.
 * If the source was put out in a PR, I'm sure feedback would include adding a generic error handler, which I agree with.
 
