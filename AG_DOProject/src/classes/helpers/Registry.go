@@ -270,10 +270,9 @@ func (x *RegistryCache) Invoke(operation string, packageName string, repoName st
 			x.uploadPackage(packageName);
 			break;
 		case "update":
-//debug
 			for _, repo := range x.repositories {
 				repo.Packages = map[string]*Package{};
-				//go func(repo *Repository) {
+				go func(repo *Repository) {
 					repo.loadPackages(repo.BasePath());
 					var packages = (&common.RestHelper{}).InvokeGet(fmt.Sprintf("%s/api/update/", repo.Url), map[string]string{});
 					if packages != nil {
@@ -290,7 +289,7 @@ func (x *RegistryCache) Invoke(operation string, packageName string, repoName st
 						jsonString, _ := json.Marshal(repo);
 						ioutil.WriteFile(fmt.Sprintf("%s/repo.json", repo.BasePath()), []byte(jsonString), 0755);
 					}
-				//}(repo);
+				}(repo)
 			}
 			break;
 		case "upgrade":
