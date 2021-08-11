@@ -11,6 +11,7 @@ import (
 	"os/user"
 	"strings"
 	"strconv"
+	"sync"
 )
 
 // PackageDependency
@@ -270,7 +271,9 @@ func (x *RegistryCache) Invoke(operation string, packageName string, repoName st
 			x.uploadPackage(packageName);
 			break;
 		case "update":
+			var group sync.WaitGroup;
 			for _, repo := range x.repositories {
+				group.Add(1);
 				repo.Packages = map[string]*Package{};
 				go func(repo *Repository) {
 					repo.loadPackages(repo.BasePath());
@@ -289,8 +292,10 @@ func (x *RegistryCache) Invoke(operation string, packageName string, repoName st
 						jsonString, _ := json.Marshal(repo);
 						ioutil.WriteFile(fmt.Sprintf("%s/repo.json", repo.BasePath()), []byte(jsonString), 0755);
 					}
-				}(repo)
+					group.Done();
+				}(repo);
 			}
+			group.Wait();
 			break;
 		case "upgrade":
 			for _, repo := range x.repositories {
