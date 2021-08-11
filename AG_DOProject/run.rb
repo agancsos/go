@@ -12,7 +12,7 @@ class Bootstrapper
 	def initialize(m, shutdown=false)
 		@mode = m;
 		@working_directory = File.expand_path(File.dirname(__FILE__));
-		@where_command = RUBY_PLATFORM.include?("mingw") ? "where" : "command -v";
+		@where_command = RUBY_PLATFORM.include?("mingw") ? "where" : "which";
 		@grep_command = RUBY_PLATFORM.include?("mingw") ? "findstr" : "grep";
 		@where_command = "" if RUBY_PLATFORM.include?("mingw");
 		@remote_base_path = "#{ENV["HOME"]}/stuff/go/agdo"
