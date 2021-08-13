@@ -116,7 +116,7 @@ The bootstrap script is being provided to demonstrate knowledge of Ruby as well 
 When in this mode, the script will attempt to run the build and Unit Tests via a Docker container.  It first checks if Docker is installed, if not, the script will raise an exception.  If Docker is found, it continues it's standard workflow described in more detail under the "Container" section.  
 
 #### Build (--build)
-When in this mode
+When in this mode the bootstrapper will simply generate the binaries locally in the dist directory, ready for publication.
 
 ### Container
 A Docker container is being provided for use within a QA test bed and to demonstrate knowledge of configuring a container.  The Dockerfile takes the base image, in this case a Ubuntu 18.04, installs the dependencies, creates required directories ($HOME/stuff/go/agdo), then copies the initial source files.  The bootstrap script then checks if the container is still up, the following steps are taken:
