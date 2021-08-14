@@ -1,0 +1,16 @@
+syntax = "proto2";
+option go_package = "./rpcapi";
+
+// Service declaration
+service RpcApi {
+	rpc GetVersion(TextMessage) returns (TextMessage) {};
+	rpc GetHello(TextMessage) returns (TextMessage) {};
+}
+/*****************************************************************************/
+
+// Message definitions
+message TextMessage {
+    optional string text = 1;
+}
+/*****************************************************************************/
+

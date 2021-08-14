@@ -1,0 +1,34 @@
+syntax = "proto2";
+option go_package = "./rpcapi";
+
+// Service declaration
+service RpcApi {
+	rpc GetVersion(TextMessage)                 returns (TextMessage) {};
+	rpc GetHello(TextMessage)                   returns (TextMessage) {};
+	rpc GetMultiplyValue(OperationalMessage)    returns (NumericMessage) {};
+	rpc GetAdditiveValue(OperationalMessage)    returns (NumericMessage) {};
+	rpc GetSubtractionValue(OperationalMessage) returns (NumericMessage) {};
+	rpc GetDivisionvalue(OperationalMessage)    returns (NumericMessage) {};
+}
+/*****************************************************************************/
+
+// Message definitions
+message TextMessage {
+    optional string text = 1;
+}
+
+message ParameterizedMessage {
+	required string name = 1;
+	required string value = 2;
+}
+
+message NumericMessage {
+	required int32 value = 1;
+}
+
+message OperationalMessage {
+	required int32 left = 1;
+	required int32 right = 2;
+}
+/*****************************************************************************/
+
