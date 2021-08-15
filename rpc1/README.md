@@ -74,7 +74,7 @@ When in this mode the bootstrapper will simply generate the binaries locally in 
 When in this mode, the script will help generate a fresh copy of the stubs that can be used to update the rpcapi package modules.  Once the protocol is generated, all other steps will require manual intervention.  As this mode requires additional development steps, it is a local only operation.
 
 ### Container
-A Docker container is being provided for use within a QA test bed and to demonstrate knowledge of configuring a container.  The Dockerfile takes the base image, in this case a Ubuntu 18.04, installs the dependencies, creates required directories ($HOME/stuff/go/agdo), then copies the initial source files.  The bootstrap script then checks if the container is still up, the following steps are taken:
+A Docker container is being provided for use within a QA test bed and to demonstrate knowledge of configuring a container.  The Dockerfile takes the base image, in this case the latest OpenSUSE, installs the dependencies, creates required directories ($HOME/stuff/go/rpc1), then copies the initial source files.  The bootstrap script then checks if the container is still up, the following steps are taken:
 1. Performs needed steps to copy the latest source files (stops the container, copies the files, and starts the container).
 2. Compiles the code and runs the Unit Tests via the compile.py script
 
