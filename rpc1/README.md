@@ -62,7 +62,7 @@ The project comes with a compile script, compile.py that when the compile.py ran
 * -c            : Name of the component to compile
 
 ### Bootstrap
-The bootstrap script is being provided to demonstrate knowledge of Ruby as well as to assist in running the source code.  The bootstrap script can be ran in two primary modes and depending on which mode is detected, a container will be attempted or the build will be created locally.  When the build is ran through the bootstrap script, the working directory will be driven by the "$HOME/stuff/go/agdo" value.  This is somewhat of an abstract path, in that $GOPATH is explicitly set to "$HOME/stuff/go" due to custom packages.  The "agdo" directory is then used simply as the workspace for the project.
+The bootstrap script is being provided to demonstrate knowledge of Ruby as well as to assist in running the source code.  The bootstrap script can be ran in two primary modes and depending on which mode is detected, a container will be attempted or the build will be created locally.  When the build is ran through the bootstrap script, the working directory will be driven by the "$HOME/stuff/go/rpc1" value.  This is somewhat of an abstract path, in that $GOPATH is explicitly set to "$HOME/stuff/go" due to custom packages.  The "rpc1" directory is then used simply as the workspace for the project.
 
 #### QA (--QA)
 When in this mode, the script will attempt to run the build and Unit Tests via a Docker container.  It first checks if Docker is installed, if not, the script will raise an exception.  If Docker is found, it continues it's standard workflow described in more detail under the "Container" section.  
