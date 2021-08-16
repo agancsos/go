@@ -109,3 +109,4 @@ Although several references were used for quick lookups, this project would not 
 
 ## Next Steps
 * Build out a more useful gRPC service for further practice and education.
+* RPC services were implemented in the same module as the stubs, which seems to me like horrible practice. Future projects will have them implemented in a different module.
