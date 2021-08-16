@@ -15,7 +15,7 @@ class Bootstrapper
 		@where_command = RUBY_PLATFORM.include?("mingw") ? "where" : "which";
 		@grep_command = RUBY_PLATFORM.include?("mingw") ? "findstr" : "grep";
 		@where_command = "" if RUBY_PLATFORM.include?("mingw");
-		@remote_base_path = "#{ENV["HOME"]}/stuff/go/rpcapi1"
+		@remote_base_path = "#{ENV["HOME"]}/stuff/go/rpc1"
 		@go_path = `#{@where_command} go`.strip();
 
 		## Since we try to print the Docker executable path and Windows might have multiple entries, this needs to be handle differently.
