@@ -156,5 +156,6 @@ The following referenced were used to help build some of the aspects of this too
 * Design and implementation time was about 7 days, which I'm not really thrilled with as if I would have continued the rest of the process, this would have shown insufficient experience.
 * I would have probably scoped the project better as I included other items (Chief recipe, bootstrap, etc) that may not have mattered.  I included these to show my range of skills.  This would have most likely helped with implementation time.
 * If the source was put out in a PR, I'm sure feedback would include adding a generic error handler, which I agree with.
+* The install operation supports only 1 package at a time, I would change the implementation to support multiple.
 
 
