@@ -42,14 +42,14 @@ class Compiler:
 	## 3. golang.org/x/text
 	def __install_golang_dependencies(self):
 		packages = {"google.golang.org/grpc", "google.golang.org/protobuf", "google.golang.org/genproto"};
-		assert os.path.exists("{0}/go".format(os.environ.get("HOME"))), "Missing Go directory...";
-		if not os.path.exists("{0}/go/src".format(os.environ.get("HOME"))): os.mkdir("{0}/go/src".format(os.environ.get("HOME")));
+		assert os.path.exists("{0}".format(os.environ.get("GOPATH"))), "Missing Go directory...";
+		if not os.path.exists("{0}/src".format(os.environ.get("GOPATH"))): os.mkdir("{0}/src".format(os.environ.get("GOPATH")));
 		for package in packages:
-			if not os.path.exists("{0}/go/src/{1}".format(os.environ.get("HOME"), package)):
+			if not os.path.exists("{0}/src/{1}".format(os.environ.get("GOPATH"), package)):
 				## Check if the package exists in the cache already
-				if len(glob.glob("{0}/go/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
-					cache = glob.glob("{0}/go/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
-					for item in cache: shutil.copytree(item, "{0}/go/src/{1}".format(os.environ.get("HOME"), package));
+				if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
+					cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("GOPATH"), package));
+					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("HOME"), package));
 					pass;
 				else:
 					## Install using go install
@@ -57,9 +57,9 @@ class Compiler:
 					
 					## Copy from mod to src
 					cache = None;
-					if len(glob.glob("{0}/go/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
-						cache = glob.glob("{0}/go/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
-					for item in cache: shutil.copytree(item, "{0}/go/src/{1}".format(os.environ.get("HOME"), package));
+					if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("GOPATH"), package))) > 0:
+						cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("GOPATH"), package));
+					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("GOPATH"), package));
 					pass;
 				pass;
 		pass;
