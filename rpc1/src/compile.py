@@ -42,13 +42,13 @@ class Compiler:
 	## 3. golang.org/x/text
 	def __install_golang_dependencies(self):
 		packages = {"google.golang.org/grpc", "google.golang.org/protobuf", "google.golang.org/genproto"};
-		assert os.path.exists("{0}".format(os.environ.get("GOPATH"))), "Missing Go directory...";
-		if not os.path.exists("{0}/src".format(os.environ.get("GOPATH"))): os.mkdir("{0}/src".format(os.environ.get("GOPATH")));
+		assert os.path.exists("{0}".format(os.environ.get("HOME"))), "Missing Go directory...";
+		if not os.path.exists("{0}/src".format(os.environ.get("HOME"))): os.mkdir("{0}/src".format(os.environ.get("HOME")));
 		for package in packages:
-			if not os.path.exists("{0}/src/{1}".format(os.environ.get("GOPATH"), package)):
+			if not os.path.exists("{0}/src/{1}".format(os.environ.get("HOME"), package)):
 				## Check if the package exists in the cache already
 				if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
-					cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("GOPATH"), package));
+					cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
 					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("HOME"), package));
 					pass;
 				else:
@@ -57,9 +57,9 @@ class Compiler:
 					
 					## Copy from mod to src
 					cache = None;
-					if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("GOPATH"), package))) > 0:
-						cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("GOPATH"), package));
-					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("GOPATH"), package));
+					if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
+						cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
+					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("HOME"), package));
 					pass;
 				pass;
 		pass;
