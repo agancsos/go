@@ -56,6 +56,7 @@ class Compiler:
 					os.system("go install {0}@latest".format(package));
 					
 					## Copy from mod to src
+					cache = None;
 					if len(glob.glob("{0}/go/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
 						cache = glob.glob("{0}/go/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
 					for item in cache: shutil.copytree(item, "{0}/go/src/{1}".format(os.environ.get("HOME"), package));
