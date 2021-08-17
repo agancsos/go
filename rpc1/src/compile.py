@@ -41,27 +41,37 @@ class Compiler:
 	## 2. golang.org/x/net
 	## 3. golang.org/x/text
 	def __install_golang_dependencies(self):
-		packages = {"google.golang.org/grpc", "google.golang.org/protobuf", "google.golang.org/genproto"};
+		packages = {
+			"google.golang.org/grpc",
+			"google.golang.org/protobuf",
+			"google.golang.org/genproto",
+			"github.com/golang/protobuf",
+			"golang.org/x/net",
+			"golang.org/x/text",
+			"golang.org/x/sys"
+		};
 		assert os.path.exists("{0}".format(os.environ.get("HOME"))), "Missing Go directory...";
 		if not os.path.exists("{0}/src".format(os.environ.get("HOME"))): os.mkdir("{0}/src".format(os.environ.get("HOME")));
 		for package in packages:
-			if not os.path.exists("{0}/src/{1}".format(os.environ.get("HOME"), package)):
-				## Check if the package exists in the cache already
-				if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
-					cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
-					for item in cache: shutil.copytree(item, item.split("@")[0].replace("pkg/mod", "src"));
-					pass;
-				else:
-					## Install using go install
-					os.system("go install {0}@latest".format(package));
-					
-					## Copy from mod to src
-					cache = None;
+			try:
+				if not os.path.exists("{0}/src/{1}".format(os.environ.get("HOME"), package)):
+					## Check if the package exists in the cache already
 					if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
 						cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
 						for item in cache: shutil.copytree(item, item.split("@")[0].replace("pkg/mod", "src"));
+						pass;
+					else:
+						## Install using go install
+						os.system("GO111MODULE=on go install {0}@latest".format(package));
+					
+						## Copy from mod to src
+						cache = None;
+						if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
+							cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
+							for item in cache: shutil.copytree(item, item.split("@")[0].replace("pkg/mod", "src"));
+						pass;
 					pass;
-				pass;
+			except: pass;
 		pass;
 
 	def invoke(self):
