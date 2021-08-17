@@ -49,7 +49,7 @@ class Compiler:
 				## Check if the package exists in the cache already
 				if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
 					cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
-					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("HOME"), package));
+					for item in cache: shutil.copytree(item, item.split("@")[0].replace("pkg/mod", "src"));
 					pass;
 				else:
 					## Install using go install
@@ -59,7 +59,7 @@ class Compiler:
 					cache = None;
 					if len(glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package))) > 0:
 						cache = glob.glob("{0}/pkg/mod/{1}@*".format(os.environ.get("HOME"), package));
-					for item in cache: shutil.copytree(item, "{0}/src/{1}".format(os.environ.get("HOME"), package));
+						for item in cache: shutil.copytree(item, item.split("@")[0].replace("pkg/mod", "src"));
 					pass;
 				pass;
 		pass;
