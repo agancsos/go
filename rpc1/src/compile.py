@@ -87,10 +87,10 @@ class Compiler:
 				for c in components:
 					comps = c.split("_");
 					component_name = comps[1].replace(".go", "");
-					os.system("cd {0}src && go build -o {0}dist/rpc1{1} main_{1}.go".format(self.base_path, component_name));
+					os.system("cd {0}src && GO111MODULE=off go build -o {0}dist/rpc1{1} main_{1}.go".format(self.base_path, component_name));
 				pass;
 			else:
-				os.system("cd {0}src && go build -o {0}dist/rpc1{1} main_{1}.go".format(self.base_path, self.component));
+				os.system("cd {0}src && GO111MODULE=off go build -o {0}dist/rpc1{1} main_{1}.go".format(self.base_path, self.component));
 				pass;
 			self.__run_unit_tests();
 			pass;
