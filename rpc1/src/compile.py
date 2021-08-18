@@ -62,7 +62,7 @@ class Compiler:
 						pass;
 					else:
 						## Install using go install
-						os.system("GO111MODULE=on go install {0}@latest".format(package));
+						os.system("export GOPATH={0} & GO111MODULE=on go install {1}@latest".format(os.environ.get("HOME"), package));
 					
 						## Copy from mod to src
 						cache = None;
@@ -87,10 +87,10 @@ class Compiler:
 				for c in components:
 					comps = c.split("_");
 					component_name = comps[1].replace(".go", "");
-					os.system("cd {0}src && GO111MODULE=off go build -o {0}dist/rpc1{1} main_{1}.go".format(self.base_path, component_name));
+					os.system("export GOPATH={0} && cd {1}src && GO111MODULE=off go build -o {1}dist/rpc1{2} main_{2}.go".format(os.environ.get("HOME"), self.base_path, component_name));
 				pass;
 			else:
-				os.system("cd {0}src && GO111MODULE=off go build -o {0}dist/rpc1{1} main_{1}.go".format(self.base_path, self.component));
+				os.system("export GOPATH={0} && cd {1}src && GO111MODULE=off go build -o {1}dist/rpc1{2} main_{2}.go".format(os.environ.get("HOME"), self.base_path, self.component));
 				pass;
 			self.__run_unit_tests();
 			pass;
