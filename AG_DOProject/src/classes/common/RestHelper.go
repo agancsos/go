@@ -3,13 +3,14 @@ import (
     "net/http"
 	"bytes"
 	"io/ioutil"
+	"fmt"
 )
 
 type RestHelper struct {
 	BasePath   string
 }
 
-func (x *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[string]interface{} {
+func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[string]interface{} {
 	var client = http.Client{};
 	req, err := http.NewRequest("GET", endpoint, nil);
 	for key, value := range headers {
@@ -23,10 +24,10 @@ func (x *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[s
     return nil;
 }
 
-func (x *RestHelper) InvokePost(endpoint string, jsonBody map[string]string,  headers map[string]string) map[string]interface{} {
+func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
     body := StrDictionaryToJsonString(jsonBody)
 	var client = http.Client{};
-	req, err := http.NewRequest("POST", endpoint, bytes.NewReader([]byte(body)));
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(fmt.Sprintf("%s", body))));
 	for key, value := range headers {
         req.Header.Add(key, value);
     }
@@ -38,12 +39,12 @@ func (x *RestHelper) InvokePost(endpoint string, jsonBody map[string]string,  he
     return nil;
 }
 
-func EnsureRestMethod(request *http.Request, method string) bool {
-	if request == nil || request.Method != method {
+func EnsureRestMethod(a *http.Request, b string) bool {
+	if a == nil || a.Method != b {
 		return false;
 	}
-	var body, _ = ioutil.ReadAll(request.Body);
-	if method == "POST" && string(body) == "" {
+	var body, _ = ioutil.ReadAll(a.Body);
+	if b == "POST" && string(body) == "" {
 		return false;
 	}
 	return true;

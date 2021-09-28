@@ -50,27 +50,27 @@ func StrToDictionary(s []byte) map[string]interface{} {
 	return obj;
 }
 
-func DictionaryToJsonString (dictionary map[string]interface{}) string {
+func DictionaryToJsonString (a map[string]interface{}) string {
 	var result = "{";
-	var i = 0;
-	for key, value := range dictionary {
-		if i > 0 { result += ","; }
-		result += fmt.Sprintf("\"%s\":\"%s\"", key, value);
-		i++;
+	for key, value := range a {
+		result += fmt.Sprintf("\"%s\":\"%v\"", key, value);
 	}
 	result += "}";
 	return result;
 }
 
-func StrDictionaryToJsonString (dictionary map[string]string) string {
+func StrDictionaryToJsonString (a map[string]string) string {
     var result = "{";
-    for key, value := range dictionary {
+	var i = 0;
+    for key, value := range a {
+		if i > 0 { result += ","; }
         result += fmt.Sprintf("\"%s\":\"%s\"", key, value);
+		i++;
     }
     result += "}";
     return result;
 }
 
-func ToConstStr(str string) *C.uchar {
-	return (*C.uchar)(unsafe.Pointer(&[]byte(str)[0]))
+func ToConstStr(a string) *C.uchar {
+	return (*C.uchar)(unsafe.Pointer(&[]byte(a)[0]))
 }
