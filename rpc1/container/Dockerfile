@@ -5,7 +5,7 @@ expose 33066
 expose 4441
 run export PATH=$PATH:/usr/sbin:usr/bin
 run export HOME=/root
-run zypper update
+run zypper update -y
 run zypper install -y iputils net-tools-deprecated
 run zypper install -y vim gcc-c++ cmake valgrind ruby go rsync protoc*
 run mkdir -p $HOME/stuff/go
