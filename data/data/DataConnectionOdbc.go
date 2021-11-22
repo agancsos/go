@@ -3,8 +3,8 @@ package data
 /*
 #include <sql.h>
 #include <sqlext.h>
-#cgo linux LDFLAGS: -lodbc
-#cgo darwin LDFLAGS: -liodbc
+#cgo linux LDFLAGS: -lodbc -ldl
+#cgo darwin LDFLAGS: -lodbc -ldl
 #cgo linux CFLAGS: -I"/usr/local/include/" -std=c11
 #cgo darwin CFLAGS: -I"/usr/local/include/" -std=c11
 */
