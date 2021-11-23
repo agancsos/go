@@ -9,18 +9,18 @@ Test program to see if it would be possible to get metadata information for Disn
 * The endpoint is known due to Disney+ being a JavaScript application.
 
 ## Requirements
-* DisneyDownloader will allow users to list metadata information for media.
-* DisneyDownloader will allow users to download media content.
-* DisneyDownloader will allow users to scan for additional media content.
+* DisneyDownload will allow users to list metadata information for media.
+* DisneyDownload will allow users to download media content.
+* DisneyDownload will allow users to scan for additional media content.
 
 ## Constraints
-* DisneyDownloader must make calls to only a development sandbox.
-* DisneyDownloader must not impact Disney servers.
-* DisneyDownloader must be lightwight and easily portable.
-* DisneyDownloader must be compiled.
-* DisneyDownloader must be compatible with Windows 10+.
-* DisneyDownloader must be compatible with SUSE 15+.
-* DisneyDownloader must be compatible with macOS 10.15+.
+* DisneyDownload must make calls to only a development sandbox.
+* DisneyDownload must not impact Disney servers.
+* DisneyDownload must be lightwight and easily portable.
+* DisneyDownload must be compiled.
+* DisneyDownload must be compatible with Windows 10+.
+* DisneyDownload must be compatible with SUSE 15+.
+* DisneyDownload must be compatible with macOS 10.15+.
 
 ## Retrospective
 * Based on the metadata from the browser, even if there was a public API, access would be cut short due to a script CORS policy.
