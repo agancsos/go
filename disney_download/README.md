@@ -27,8 +27,9 @@ Test program to see if it would be possible to get metadata information for Disn
     * API access is clearly closed to internal access
 * Disney+ uses other API's, which doesn't surprise me, but applicationTokens and licenses can clearly be seen in the JavaScript.
 * Possible API endpoints:
+
 |Endpoint|Description|
-|--|--|
+|---|---|
 |https://prod-ripcut-delivery.disney-plus.net/v1/|Static content used for images.|
 |https://prod-static.disney-plus.net/us-east-1/disneyPlus/app/builds/ce3f05347df82f40e2b31fa593b994e3359143c9d|Deployed build to EC2 instance.|
 
