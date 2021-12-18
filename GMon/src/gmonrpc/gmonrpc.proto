@@ -1,0 +1,60 @@
+syntax = "proto2";
+option go_package = "./gmonrpc";
+
+// Service declarations
+service ManagementPackService {
+	rpc ImportMP(IncomingServerMessage)                 returns (BooleanMessage) {};
+    rpc ExportMP(IncomingServerMessage)                 returns (JsonMessage) {};
+    rpc AddMP(IncomingServerMessage)                    returns (BooleanMessage) {};
+    rpc DeleteMP(IncomingServerMessage)                 returns (BooleanMessage) {};
+    rpc GetManagementPacks(EmptyMessage)               	returns (JsonMessage) {};
+    rpc GetManagementPack(NumericMessage)           	returns (JsonMessage) {};
+}
+
+service AgentService {
+	rpc GetAgent(NumericMessage)                        returns (JsonMessage) {};
+    rpc GetAgents(EmptyMessage)                         returns (JsonMessage) {};
+    rpc AddAgent(IncomingAgentMessage)                  returns (BooleanMessage) {};
+    rpc UpdateAgent(IncomingAgentMessage)               returns (BooleanMessage) {};
+    rpc RemoveAgent(IncomingAgentMessage)               returns (BooleanMessage) {};
+    rpc Contains(IncomingAgentMessage)                  returns (BooleanMessage) {};
+}
+
+service RoleService {
+	rpc GetRoles(EmptyMessage)                          returns (JsonMessage) {};
+    rpc GetRole(IncomingServerMessage)                  returns (JsonMessage) {};
+    rpc AddRole(IncomingServerMessage)                  returns (BooleanMessage) {};
+    rpc UpdateRole(IncomingServerMessage)               returns (BooleanMessage) {};
+    rpc DeleteRole(IncomingServerMessage)               returns (BooleanMessage) {};
+}
+
+service MonitorAgentService {
+	rpc IncomingManagementPack(IncomingAgentMessage)    returns (BooleanMessage) {};
+}
+/*****************************************************************************/
+
+
+// Message definitions
+message EmptyMessage {
+}
+
+message IncomingServerMessage {
+	required string json = 1;
+}
+
+message IncomingAgentMessage {
+	required string json = 1;
+}
+
+message BooleanMessage {
+	required bool status = 1;
+}
+
+message JsonMessage {
+	required string json = 1;
+}
+
+message NumericMessage {
+	required int32 value = 1;
+}
+/*****************************************************************************/
