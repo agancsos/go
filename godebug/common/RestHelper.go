@@ -3,6 +3,7 @@ import (
     "net/http"
 	"bytes"
 	"io/ioutil"
+	"fmt"
 )
 
 type RestHelper struct {
@@ -23,10 +24,10 @@ func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[s
     return nil;
 }
 
-func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string,  headers map[string]string) map[string]interface{} {
+func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
     body := StrDictionaryToJsonString(jsonBody)
 	var client = http.Client{};
-	req, err := http.NewRequest("POST", endpoint, bytes.NewReader([]byte(body)));
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(fmt.Sprintf("%s", body))));
 	for key, value := range headers {
         req.Header.Add(key, value);
     }
@@ -36,4 +37,15 @@ func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string,  he
 		return StrToDictionary(rspData);
     }
     return nil;
+}
+
+func EnsureRestMethod(a *http.Request, b string) bool {
+	if a == nil || a.Method != b {
+		return false;
+	}
+	var body, _ = ioutil.ReadAll(a.Body);
+	if b == "POST" && string(body) == "" {
+		return false;
+	}
+	return true;
 }
