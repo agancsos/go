@@ -1,6 +1,6 @@
 package data
 /*
-#cgo linux LDFLAGS: -lm -ldl
+#cgo linux LDFLAGS: -lm
 #cgo openbsd LDFLAGS: -lm
 #cgo linux,!android CFLAGS: -DHAVE_FDATASYNC=1
 #cgo linux,!android CFLAGS: -DHAVE_PREAD=1 -DHAVE_PWRITE=1
