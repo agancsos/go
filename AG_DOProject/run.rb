@@ -106,7 +106,7 @@ end
 ## Main
 mode = ARGV[0] != nil ? ARGV[0] : "--QA";
 no_shutdown = false;
-for i in 0..ARGV.length + 1
+for i in 1..ARGV.length + 1
 	no_shutdown = true if ARGV[i] == "--no-shutdown";
 end
 session = Bootstrapper::new(mode, no_shutdown);
