@@ -5,13 +5,12 @@ package data
 #include <sqlext.h>
 #cgo linux LDFLAGS: -lodbc -ldl
 #cgo darwin LDFLAGS: -lodbc -ldl
-#cgo linux CFLAGS: -I"/usr/local/include/" -std=c11
+#cgo linux CFLAGS: -I"/usr/include/" -std=c11
 #cgo darwin CFLAGS: -I"/usr/local/include/" -std=c11
 */
 import "C";
 import (
 	"../common"
-	"unsafe"
 	"fmt"
 )
 var MAX_COLUMN_LENGTH = 1024;
@@ -49,12 +48,12 @@ func (x *DataConnectionOdbc) Query(a string) *DataTable {
             }
             var tempRow = &DataRow{};
             for col := 0; col < len(columns); col++ {
-                var data  *C.SQLCHAR;
-                var dataLen C.SQLLEN;
+                var data = make([]byte, 400000);
                 var tempColumn = &DataColumn{};
+				var dataLen C.SQLLEN;
                 tempColumn.SetName(columns[col]);
-                x.check(C.SQLGetData(statement, (C.ushort)(col + 1), C.SQL_C_CHAR, (C.SQLPOINTER)(data), (C.long)(MAX_COLUMN_LENGTH), &dataLen), "Get data");
-                var dataValue = C.GoString((*C.char)(unsafe.Pointer(data)))
+                x.check(C.SQLGetData(statement, C.ushort(col + 1), C.SQL_C_CHAR, C.SQLPOINTER(&data[0]), 400000, &dataLen), "Get data");
+                var dataValue = string(data);
                 tempColumn.SetValue(dataValue);
                 tempRow.AddColumn(tempColumn);
             }
@@ -95,11 +94,9 @@ func (x DataConnectionOdbc) GetColumnNames(a string) []string {
         x.check(C.SQLExecDirect(statement, (*C.uchar)(common.ToConstStr(a)), C.SQL_NTS), "Execute");
         x.check(C.SQLNumResultCols(statement, &cols), "Column count");
         for i := 0; i < int(cols); i++ {
-			var columnName *C.SQLCHAR;
-            var columnNameLen C.SQLSMALLINT;
-            x.check(C.SQLColAttribute(statement, (C.ushort)(i + 1), C.SQL_DESC_LABEL, (C.SQLPOINTER)(columnName),
-				(C.short)((len(C.GoString((*C.char)(unsafe.Pointer(columnName)))) * 5)), &columnNameLen, nil), "Column attribute");
-            var value = C.GoString((*C.char)(unsafe.Pointer(columnName)));
+			var columnName = make([]byte, 1024);
+            x.check(C.SQLColAttribute(statement, C.ushort(i + 1), C.SQL_DESC_LABEL, C.SQLPOINTER(&columnName[0]), 1000, nil, nil), "Column attribute");
+            var value = common.CleanString(string(columnName));
             result = append(result, value);
         }
         if statement != nil {
