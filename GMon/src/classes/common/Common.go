@@ -85,3 +85,42 @@ func StrDictionaryToJsonString (a map[string]string) string {
 func ToConstStr(a string) *C.uchar {
 	return (*C.uchar)(unsafe.Pointer(&[]byte(a)[0]))
 }
+
+func StrToStrDictionary(s string) map[string]string {
+	var rawDict = StrToDictionary([]byte(s));
+	var result = map[string]string {};
+	for key, value := range rawDict {
+		result[key] = fmt.Sprintf("%v", value);
+	}
+	return result;
+}
+
+func BoolToInt(a bool) int {
+	if a {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+func StrToStrPtr(a string) *string {
+	var result *string
+	temp := a;
+	result = &temp;
+	temp = "";
+	return result;
+}
+
+func IntToIntPtr(a int32) *int32 {
+	var result *int32;
+	temp := a;
+	result = &temp;
+	return result;
+}
+
+func BoolToBoolPtr(a bool) *bool {
+    var result *bool;
+    temp := a;
+    result = &temp;
+    return result;
+}

@@ -6,7 +6,6 @@ import (
 	"time"
 	"strconv"
 	"net/http"
-	"io/ioutil"
 	"encoding/json"
 	"../../common"
 )
@@ -172,17 +171,18 @@ func GetRestAgentServiceInstance() *RestAgentService {
 }
 
 func (x *RestAgentService) GetAgent(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
 		return;
 	}
-    data, _ := ioutil.ReadAll(r.Body);
 	id, _ := strconv.Atoi(string(data));
 	var node = x.lns.GetAgent(id);
     w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", x.lns.AddAgent(node))));
 }
 
 func (x *RestAgentService) GetAgents(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "GET") {
+	okay, _ := EnsureAuthenticated(w, r, "GET");
+	if !okay {
 		return;
 	}
 	var rsp = "{\"nodes\":[";
@@ -198,42 +198,42 @@ func (x *RestAgentService) GetAgents(w http.ResponseWriter, r *http.Request) {
 }
 
 func (x *RestAgentService) AddAgent(w http.ResponseWriter, r *http.Request) {
-	if !common.EnsureRestMethod(r, "POST") {
+	okay, data := common.EnsureRestMethod(r, "POST");
+	if !okay {
 		return;
 	}
 	var node *models.Agent;
-	data, _ := ioutil.ReadAll(r.Body);
-	json.Unmarshal(data, &node);
+	json.Unmarshal([]byte(data), &node);
 	w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(x.lns.AddAgent(node)))));
 }
 
 func (x *RestAgentService) UpdateAgent(w http.ResponseWriter, r *http.Request) {
-	if !common.EnsureRestMethod(r, "POST") {
+	okay, data := common.EnsureRestMethod(r, "POST");
+	if !okay {
 		return;
 	}
 	var node *models.Agent;
-    data, _ := ioutil.ReadAll(r.Body);
-    json.Unmarshal(data, &node);
+    json.Unmarshal([]byte(data), &node);
     w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(x.lns.UpdateAgent(node)))));
 }
 
 func (x *RestAgentService) RemoveAgent(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
 		return;
 	}
 	var node *models.Agent;
-    data, _ := ioutil.ReadAll(r.Body);
-    json.Unmarshal(data, &node);
+    json.Unmarshal([]byte(data), &node);
     w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(x.lns.RemoveAgent(node)))));
 }
 
 func (x *RestAgentService) Contains(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
 		return;
 	}
 	var node map[string]interface{};
-    data, _ := ioutil.ReadAll(r.Body);
-    json.Unmarshal(data, &node);
+    json.Unmarshal([]byte(data), &node);
     w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(x.lns.Contains(node["hostname"].(string))))));
 }
 

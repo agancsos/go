@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"../../common"
 	"strconv"
-	"io/ioutil"
 )
 
 // Interface
@@ -94,40 +93,41 @@ func GetRestMPServiceInstance() *RestManagementPackService {
     return __rest_mp_service__;
 }
 func (x *RestManagementPackService) ImportMP(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
 		return;
 	}
-	data, _ := ioutil.ReadAll(r.Body);
-	w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", x.mps.ImportMP(string(data)))));
+	w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", x.mps.ImportMP(data))));
 }
 func (x *RestManagementPackService) ExportMP(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
         return;
     }
-	data, _ := ioutil.ReadAll(r.Body);
-	var pack = x.mps.ExportMP(string(data));
+	var pack = x.mps.ExportMP(data);
 	w.Write([]byte(pack));
 }
 func (x *RestManagementPackService) AddMP(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
         return;
     }
-	data, _ := ioutil.ReadAll(r.Body);
 	var mp = &models.ManagementPack{};
-	mp.ReloadFromJson(string(data));
+	mp.ReloadFromJson(data);
 	w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", x.mps.AddMP(mp))));
 }
 func (x *RestManagementPackService) DeleteMP(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, data := EnsureAuthenticated(w, r, "POST");
+	if !okay {
         return;
     }
-	data, _ := ioutil.ReadAll(r.Body);
     var mp = &models.ManagementPack{};
-    mp.ReloadFromJson(string(data));
+    mp.ReloadFromJson(data);
     w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", x.mps.DeleteMP(mp))));
 }
 func (x *RestManagementPackService) GetManagementPacks(w http.ResponseWriter, r *http.Request) {
-	if !EnsureAuthenticated(w, r, "POST") {
+	okay, _ := EnsureAuthenticated(w, r, "GET");
+	if !okay {
         return;
     }
 	var rsp = "{\"managementPacks\":[";

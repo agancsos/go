@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"../../common"
     "net/http"
-    "io/ioutil"
     b64 "encoding/base64"
 )
 
@@ -18,7 +17,7 @@ type IAuthenticationService interface {
 	IsValid(username string, password string) bool;
 	User(username string, password string) *models.User;
 	GenerateToken(user *models.User) string;
-	Groups(key string) []string;
+	GetGroups(key string) []string;
 	AddGroup(name string) bool;
 	RemoveGroup(id int) bool;
 	IsGroupMember(user *models.User, id int) bool;
@@ -46,9 +45,9 @@ func (x *LocalAuthenticationService) IsValid(username string, password string) b
 	return x.User(username, password) != nil;
 }
 func (x *LocalAuthenticationService) User(username string, password string) *models.User {
-	sr.TS.TraceVerbose("AuthenticationService: ting user (" + username + ")", int(sr.TC_SERVICE));
+	sr.TS.TraceVerbose("AuthenticationService: Getting user (" + username + ")", int(sr.TC_SERVICE));
 	if password != "" && username != "" {
-		var rawResult = x.ds.ServiceQuery("SELECT * FROM USERS WHERE USER_USERNAME = '" + username + "' AND USER_PASSWORD = '" + password + "' AND USER_STATE = '1'");
+		var rawResult = x.ds.ServiceQuery("SELECT * FROM USER WHERE USER_USERNAME = '" + username + "' AND USER_PASSWORD = '" + password + "' AND USER_STATE = '1'");
 		if len(rawResult.Rows()) > 0 {
 			var row = rawResult.Rows()[0];
 			var result = &models.User{};
@@ -65,7 +64,7 @@ func (x *LocalAuthenticationService) User(username string, password string) *mod
 			return result;
 		}
 	} else {
-		var rawResult = x.ds.ServiceQuery("SELECT * FROM USERS WHERE USER_ID = (SELECT USER_ID FROM SESSION WHERE SESSION_TOKEN = '" + username + "') AND USER_STATE = '1'");
+		var rawResult = x.ds.ServiceQuery("SELECT * FROM USER WHERE USER_ID = (SELECT USER_ID FROM SESSION WHERE SESSION_TOKEN = '" + username + "') AND USER_STATE = '1'");
 		if len(rawResult.Rows()) == 1 {
 			var row = rawResult.Rows()[0];
 			var result = &models.User{};
@@ -100,24 +99,24 @@ func (x *LocalAuthenticationService) GenerateToken(user *models.User) string  {
 			var charIndex = (rand.Int() % (len(chars2) - 1)) + 0;
 			token = token + chars2[charIndex];
 		}
-		var rawResult = x.ds.ServiceQuery("SELECT 1 FROM SESSIONS WHERE SESSION_TOKEN = '" + token + "'");
+		var rawResult = x.ds.ServiceQuery("SELECT 1 FROM SESSION WHERE SESSION_TOKEN = '" + token + "'");
 		isValid = len(rawResult.Rows()) == 0;
 		current++;
 		if isValid { break; }
 	}
 
-	if x.ds.RunServiceQuery(fmt.Sprintf("INSERT INTO SESSIONS (SESSION_TOKEN, USER_ID, CREATED_DATE, LAST_UPDATED_DATE) VALUES ('%s', '%d', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)", token, user.ID())) {
+	if x.ds.RunServiceQuery(fmt.Sprintf("INSERT INTO SESSION (SESSION_TOKEN, USER_ID, CREATED_DATE, LAST_UPDATED_DATE) VALUES ('%s', '%d', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)", token, user.ID())) {
 		return token;
 	}
 	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: Done generating token (%d)", user.ID()), int(sr.TC_SERVICE));
 	return "";
 }
-func (x *LocalAuthenticationService) Groups(key string) []string {
+func (x *LocalAuthenticationService) GetGroups(key string) []string {
 	var result = []string{};
 	if key == "*" {
 		key = "";
 	}
-	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: ting groups (%s)", key), int(sr.TC_SERVICE));
+	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: Getting groups (%s)", key), int(sr.TC_SERVICE));
 	var table = x.ds.ServiceQuery("SELECT * FROM GROUPS WHERE GROUP_LABEL LIKE '%" + key + "%'");
 	for _, row := range table.Rows() {
 		result = append(result, fmt.Sprintf("%s:%s", row.Column("GROUP_ID").Value(), row.Column("GROUP_LABEL").Value()));
@@ -133,18 +132,18 @@ func (x *LocalAuthenticationService) AddGroup(name string) bool {
 }
 func (x *LocalAuthenticationService) RemoveGroup(id int) bool {
 	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: Removing group (%d)", id), int(sr.TC_SERVICE));
-	x.ds.RunServiceQuery(fmt.Sprintf("DELETE FROM GROUP_MEMBERS WHERE GROUP_ID = '%d'", id));
+	x.ds.RunServiceQuery(fmt.Sprintf("DELETE FROM GROUP_MEMBER WHERE GROUP_ID = '%d'", id));
 	x.ds.RunServiceQuery(fmt.Sprintf("DELETE FROM GROUPS WHERE GROUP_ID = '%d'", id));
 	return true;
 }
 func (x *LocalAuthenticationService) IsGroupMember(user *models.User, id int) bool {
 	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: Checking group membership (%d:%d)", user.ID(), id), int(sr.TC_SERVICE));
-	return len(x.ds.ServiceQuery(fmt.Sprintf("SELECT 1 FROM GROUP_MEMBERS WHERE USER_ID = '%s' AND GROUP_ID = '%d'", user.ID(), id)).Rows()) == 1;
+	return len(x.ds.ServiceQuery(fmt.Sprintf("SELECT 1 FROM GROUP_MEMBER WHERE USER_ID = '%s' AND GROUP_ID = '%d'", user.ID(), id)).Rows()) == 1;
 }
 func (x *LocalAuthenticationService) AddGroupMember(user *models.User, id int) bool {
 	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: Adding group member (%d; %d)", user.ID(), id), int(sr.TC_SERVICE));
-	if len(x.ds.ServiceQuery(fmt.Sprintf("SELECT 1 FROM GROUP_MEMBERS WHERE USER_ID = '%s' AND GROUP_ID = '%d'", user.ID(), id)).Rows()) == 0 {
-		if !x.ds.RunServiceQuery(fmt.Sprintf("INSERT INTO GROUP_MEMBERS (USER_ID, GROUP_ID) VALUES ('%d', '%d')", user.ID(), id)) {
+	if len(x.ds.ServiceQuery(fmt.Sprintf("SELECT 1 FROM GROUP_MEMBER WHERE USER_ID = '%s' AND GROUP_ID = '%d'", user.ID(), id)).Rows()) == 0 {
+		if !x.ds.RunServiceQuery(fmt.Sprintf("INSERT INTO GROUP_MEMBER (USER_ID, GROUP_ID) VALUES ('%d', '%d')", user.ID(), id)) {
 			sr.TS.TraceError(fmt.Sprintf("AuthenticationService: Failed to add group member (%d;%d)", user.ID(), id), int(sr.TC_SERVICE));
 		}
 	} else {
@@ -154,8 +153,8 @@ func (x *LocalAuthenticationService) AddGroupMember(user *models.User, id int) b
 }
 func (x *LocalAuthenticationService) RemoveGroupMember(user *models.User, id int) bool {
 	sr.TS.TraceVerbose(fmt.Sprintf("AuthenticationService: Removing group member (%d;%d)", user.ID(), id), int(sr.TC_SERVICE));
-	if len(x.ds.ServiceQuery(fmt.Sprintf("SELECT 1 FROM GROUP_MEMBERS WHERE USER_ID = '%d' AND GROUP_ID = '%d'", user.ID(), id)).Rows()) == 1 {
-		if !x.ds.RunServiceQuery(fmt.Sprintf("DELETE FROM GROUP_MEMBERS WHERE USER_ID = '%d' AND GROUP_ID = '%d'", user.ID(), id)) {
+	if len(x.ds.ServiceQuery(fmt.Sprintf("SELECT 1 FROM GROUP_MEMBER WHERE USER_ID = '%d' AND GROUP_ID = '%d'", user.ID(), id)).Rows()) == 1 {
+		if !x.ds.RunServiceQuery(fmt.Sprintf("DELETE FROM GROUP_MEMBER WHERE USER_ID = '%d' AND GROUP_ID = '%d'", user.ID(), id)) {
 			sr.TS.TraceError(fmt.Sprintf("AuthenticationService: Failed to remove group member (%d;%d)", user.ID(), id), int(sr.TC_SERVICE));
 		}
 	} else {
@@ -179,12 +178,12 @@ func GetRestAuthService() *RestAuthenticationService {
     return __rest_auth_service__;
 }
 func (x *RestAuthenticationService) IsValid(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
+	var okay, body = common.EnsureRestMethod(r, "POST");
+    if !okay {
         w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
         return;
     }
-    var body, _ = ioutil.ReadAll(r.Body);
-    var json = common.StrToDictionary(body);
+    var json = common.StrToDictionary([]byte(body));
     if json["credentials"] == nil {
         w.Write([]byte("{\"message\":\"Credentials missing\"}"));
         return;
@@ -213,18 +212,13 @@ func (x *RestAuthenticationService) IsValid(w http.ResponseWriter, r *http.Reque
     }
     w.Write([]byte(fmt.Sprintf("{\"token\":\"%s\"}", token)));
 }
-func (x *RestAuthenticationService) Groups(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return;
-    }
-	if !x.las.IsValid(sr.ExtractApiToken(r), "") {
-		w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
+func (x *RestAuthenticationService) GetGroups(w http.ResponseWriter, r *http.Request) {
+	okay, search := EnsureAuthenticated(w, r, "POST");
+    if !okay {
 		return;
 	}
-	var search, _ = ioutil.ReadAll(r.Body);
 	var s = string(search);
-	var groups = x.las.Groups(s);
+	var groups = x.las.GetGroups(s);
 	var rsp = fmt.Sprintf("{\"groups\":[");
 	for i, value := range groups {
 		if i > 0 {
@@ -236,80 +230,55 @@ func (x *RestAuthenticationService) Groups(w http.ResponseWriter, r *http.Reques
 	w.Write([]byte(rsp));
 }
 func (x *RestAuthenticationService) AddGroup(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return;
-    }
-	if !x.las.IsValid(sr.ExtractApiToken(r), "") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
-        return;
-    }
-	var data, _ = ioutil.ReadAll(r.Body);
+	okay, data := EnsureAuthenticated(w, r, "POST");
+    if !okay {
+		return;
+	}
 	var group = string(data);
 	var result = x.las.AddGroup(group);
-	w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(result))));
+	w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", result)));
 }
 func (x *RestAuthenticationService) RemoveGroup(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return;
-    }
-	if !x.las.IsValid(sr.ExtractApiToken(r), "") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
-        return;
-    }
-	var data, _ = ioutil.ReadAll(r.Body);
+	okay, data := EnsureAuthenticated(w, r, "POST")
+    if !okay {
+		return;
+	}
     var id, _ = strconv.Atoi(string(data));
     var result = x.las.RemoveGroup(id);
-    w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(result))));
+    w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", result)));
 }
 func (x *RestAuthenticationService) IsGroupMember(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return;
-    }
-	if !x.las.IsValid(sr.ExtractApiToken(r), "") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
-        return;
-    }
-	var data, _ = ioutil.ReadAll(r.Body);
-    var obj = common.StrToDictionary(data);
+	okay, data := EnsureAuthenticated(w, r, "POST");
+    if !okay {
+		return;
+	}
+    var obj = common.StrToDictionary([]byte(data));
 	var user = &models.User{};
 	var userId, _ = strconv.Atoi(obj["user"].(string));
 	user.SetID(userId);
 	var groupId, _ = strconv.Atoi(obj["group"].(string));
     var result = x.las.IsGroupMember(user, groupId);
-    w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(result))));
+    w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", result)));
 }
 func (x *RestAuthenticationService) AddGroupMember(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return;
-    }
-	if !x.las.IsValid(sr.ExtractApiToken(r), "") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
-        return;
-    }
-	var data, _ = ioutil.ReadAll(r.Body);
-    var obj = common.StrToDictionary(data);
+	okay, data := EnsureAuthenticated(w, r, "POST");
+    if !okay {
+		return;
+	}
+    var obj = common.StrToDictionary([]byte(data));
     var user = &models.User{};
     var userId, _ = strconv.Atoi(obj["user"].(string));
     user.SetID(userId);
     var groupId, _ = strconv.Atoi(obj["group"].(string));
     var result = x.las.AddGroupMember(user, groupId);
-    w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", common.BoolToInt(result))));
+    w.Write([]byte(fmt.Sprintf("{\"result\":\"%d\"}", result)));
 }
 func (x *RestAuthenticationService) RemoveGroupMember(w http.ResponseWriter, r *http.Request) {
-    if !common.EnsureRestMethod(r, "POST") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return;
-    }
-	if !x.las.IsValid(sr.ExtractApiToken(r), "") {
-        w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
-        return;
-    }
-	var data, _ = ioutil.ReadAll(r.Body);
-    var obj = common.StrToDictionary(data);
+	okay, data := EnsureAuthenticated(w, r, "POST");
+    if !okay {
+		return;
+	}
+    var obj = common.StrToDictionary([]byte(data));
     var user = &models.User{};
     var userId, _ = strconv.Atoi(obj["user"].(string));
     user.SetID(userId);
@@ -321,8 +290,8 @@ func (x *RestAuthenticationService) Initialize() {
     http.HandleFunc("/auth/", x.IsValid);
     http.HandleFunc("/group/add/", x.AddGroup);
     http.HandleFunc("/group/remove/", x.RemoveGroup);
-    http.HandleFunc("/group/getall/", x.Groups);
-    http.HandleFunc("/group/list/", x.Groups);
+    http.HandleFunc("/group/getall/", x.GetGroups);
+    http.HandleFunc("/group/list/", x.GetGroups);
     http.HandleFunc("/group/ismember/", x.IsGroupMember);
     http.HandleFunc("/group/addmember/", x.AddGroupMember);
     http.HandleFunc("/group/removemember/", x.RemoveGroupMember);
@@ -330,4 +299,3 @@ func (x *RestAuthenticationService) Initialize() {
 func (x *RestAuthenticationService) User(w http.ResponseWriter, r *http.Request) {}
 func (x *RestAuthenticationService) GenerateToken(w http.ResponseWriter, r *http.Request)  {}
 /*****************************************************************************/
-

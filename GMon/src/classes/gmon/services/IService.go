@@ -41,7 +41,7 @@ func (x *EmptyServiceProvider) GetServices() map[string]IService { return x.serv
 /*****************************************************************************/
 
 // ConfigurationService
-type ConfigurationService struct {}
+type ConfigurationService struct {dictionary    map[string]interface{}}
 var __configuration_service__ *ConfigurationService;
 func GetConfigurationServiceInstance() *ConfigurationService {
 	if __configuration_service__ == nil {
@@ -49,15 +49,18 @@ func GetConfigurationServiceInstance() *ConfigurationService {
 	}
 	return __configuration_service__;
 }
-func (x *ConfigurationService) GetProperty(a string) interface{} {
-	rawXml, _ := ioutil.ReadFile((sr.SRI).GetConfigurationFile());
-	var dict = common.StrToDictionary(rawXml);
-	return dict[a];
+func (x *ConfigurationService) GetProperty(name string, defaultValue string) interface{} {
+    rawXml, _ := ioutil.ReadFile((sr.GetSRInstance()).GetConfigurationFile());
+    x.dictionary = common.StrToDictionary(rawXml);
+    if x.dictionary[name] == nil { return defaultValue; }
+    return x.dictionary[name];
 }
-func (x *ConfigurationService) SaveConfiguration(a string) {
-	ioutil.WriteFile((sr.SRI).GetConfigurationFile(), []byte(a), 'w');
+func (x *ConfigurationService) SaveConfiguration(raw string) {
+    ioutil.WriteFile((sr.GetSRInstance()).GetConfigurationFile(), []byte(raw), 'w');
 }
-func (x *ConfigurationService) GetKey(a string) interface{} { return x.GetProperty(a); }
+func (x *ConfigurationService) GetKey(name string, defaultValue string) interface{} {
+	return x.GetProperty(name, defaultValue);
+}
 /*****************************************************************************/
 
 
