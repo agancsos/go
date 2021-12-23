@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"encoding/json"
+	"unicode"
 )
 func PadRight(str string, le int, pad string) string {
 	if len(str) > le {
@@ -17,6 +18,16 @@ func PadRight(str string, le int, pad string) string {
 		result += pad;
 	}
 	return result + str;
+}
+
+func CleanString(a string) string {
+	var result = strings.Map(func(r rune) rune {
+		if unicode.IsPrint(r) {
+			return r
+		}
+		return -1
+	}, a);
+	return result;
 }
 
 func PadLeft(str string, le int, pad string) string {
@@ -71,44 +82,6 @@ func StrDictionaryToJsonString (a map[string]string) string {
     return result;
 }
 
-func DictionaryToStrDictionary(a map[string]interface{}) map[string]string {
-	var result = map[string]string {};
-	for key, value := range a {
-		result[key] = fmt.Sprintf("%v", value);
-	}
-	return result;
-}
-
 func ToConstStr(a string) *C.uchar {
 	return (*C.uchar)(unsafe.Pointer(&[]byte(a)[0]))
-}
-
-func StrToStrPtr(a string) *string {
-	var result *string
-	temp := a;
-	result = &temp;
-	temp = "";
-	return result;
-}
-
-func IntToIntPtr(a int32) *int32 {
-	var result *int32;
-	temp := a;
-	result = &temp;
-	return result;
-}
-
-func BoolToBoolPtr(a bool) *bool {
-    var result *bool;
-    temp := a;
-    result = &temp;
-    return result;
-}
-
-func BoolToInt(a bool) int {
-	if a {
-		return 1;
-	} else {
-		return 0;
-	}
 }

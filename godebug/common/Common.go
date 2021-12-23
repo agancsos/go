@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"encoding/json"
+	"unicode"
 )
 func PadRight(str string, le int, pad string) string {
 	if len(str) > le {
@@ -17,6 +18,16 @@ func PadRight(str string, le int, pad string) string {
 		result += pad;
 	}
 	return result + str;
+}
+
+func CleanString(a string) string {
+	var result = strings.Map(func(r rune) rune {
+		if unicode.IsPrint(r) {
+			return r
+		}
+		return -1
+	}, a);
+	return result;
 }
 
 func PadLeft(str string, le int, pad string) string {
@@ -61,9 +72,16 @@ func DictionaryToJsonString (a map[string]interface{}) string {
 
 func StrDictionaryToJsonString (a map[string]string) string {
     var result = "{";
+	var i = 0;
     for key, value := range a {
+		if i > 0 { result += ","; }
         result += fmt.Sprintf("\"%s\":\"%s\"", key, value);
+		i++;
     }
     result += "}";
     return result;
+}
+
+func ToConstStr(a string) *C.uchar {
+	return (*C.uchar)(unsafe.Pointer(&[]byte(a)[0]))
 }

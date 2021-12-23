@@ -39,17 +39,6 @@ func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, hea
     return nil;
 }
 
-<<<<<<< HEAD
-func EnsureRestMethod(a *http.Request, b string) (bool, string) {
-	if a == nil || a.Method != b {
-		return false, "";
-	}
-	var body, _ = ioutil.ReadAll(a.Body);
-	if b == "POST" && string(body) == "" {
-		return false, string(body);
-	}
-	return true, string(body);
-=======
 func EnsureRestMethod(a *http.Request, b string) bool {
 	if a == nil || a.Method != b {
 		return false;
@@ -59,5 +48,4 @@ func EnsureRestMethod(a *http.Request, b string) bool {
 		return false;
 	}
 	return true;
->>>>>>> 0e1c84c30b02a7c14fc2c37c72407b4c56c57873
 }
