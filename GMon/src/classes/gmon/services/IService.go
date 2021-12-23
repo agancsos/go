@@ -3,8 +3,8 @@ import (
 	"../../common"
 	"../../sr"
 	"io/ioutil"
-	"fmt"
 	"net/http"
+	"fmt"
 )
 
 // Service interface
@@ -25,7 +25,7 @@ type IServiceProvider interface {
 	RegisterService (a string, b IService);
 	GetService (a string) IService;
 	ContainsService (a string) bool
-	Services() map[string]IService;
+	GetServices() map[string]IService;
 }
 /*****************************************************************************/
 
@@ -37,7 +37,7 @@ type EmptyServiceProvider struct {
 func (x *EmptyServiceProvider) RegisterService (a string, b IService) {}
 func (x *EmptyServiceProvider) GetService (a string) IService { return nil; }
 func (x *EmptyServiceProvider) ContainsService(a string) bool { return true; }
-func (x *EmptyServiceProvider) Services() map[string]IService { return x.services; }
+func (x *EmptyServiceProvider) GetServices() map[string]IService { return x.services; }
 /*****************************************************************************/
 
 // ConfigurationService
@@ -49,31 +49,30 @@ func GetConfigurationServiceInstance() *ConfigurationService {
 	}
 	return __configuration_service__;
 }
-func (x *ConfigurationService) GetProperty(a string, b interface{}) interface{} {
-	rawXml, _ := ioutil.ReadFile((sr.GetSRInstance()).GetConfigurationFile());
+func (x *ConfigurationService) GetProperty(a string) interface{} {
+	rawXml, _ := ioutil.ReadFile((sr.SRI).GetConfigurationFile());
 	var dict = common.StrToDictionary(rawXml);
-	if dict[a] == nil {
-		return b;
-	}
 	return dict[a];
 }
 func (x *ConfigurationService) SaveConfiguration(a string) {
-	ioutil.WriteFile((sr.GetSRInstance()).GetConfigurationFile(), []byte(a), 'w');
+	ioutil.WriteFile((sr.SRI).GetConfigurationFile(), []byte(a), 'w');
 }
-func (x *ConfigurationService) GetKey(a string, b interface{}) interface{} { return x.GetProperty(a, b); }
+func (x *ConfigurationService) GetKey(a string) interface{} { return x.GetProperty(a); }
 /*****************************************************************************/
 
+
 // Service helpers
-func EnsureAuthenticated(w http.ResponseWriter, r *http.Request, m string) bool {
-    if !common.EnsureRestMethod(r, m) {
+func EnsureAuthenticated(w http.ResponseWriter, r *http.Request, m string) (bool, string) {
+	okay, data := common.EnsureRestMethod(r, m);
+    if !okay {
         w.Write([]byte(fmt.Sprintf("{\"message\":\"Invalid method\"}")));
-        return false;
+        return false, data;
     }
     if !(GetLocalAuthService()).IsValid(sr.ExtractApiToken(r), "") {
         w.Write([]byte(fmt.Sprintf("{\"message\":\"User is invalid\"}")));
-        return false;
+        return false, data;
     }
-    return true;
+    return true, data;
 }
 /*****************************************************************************/
 
@@ -84,6 +83,5 @@ func EnsureAuthenticated(w http.ResponseWriter, r *http.Request, m string) bool 
 // Local service
 /*****************************************************************************/
 
-// Rest service
+// Remote service
 /*****************************************************************************/
-
