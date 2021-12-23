@@ -37,16 +37,16 @@ type DataRow struct {
 }
 func (x DataRow) Columns() []*DataColumn { return x.columns; }
 func (x DataRow) Column(name string) *DataColumn {
-	for i := 0; i < len(x.columns); i++ {
-		if x.columns[i].Name() == name {
-			return x.columns[i];
+	for _, column := range x.columns {
+		if strings.EqualFold(column.Name(), name) {
+			return column;
 		}
 	}
 	return &DataColumn{};
 }
 func (x DataRow) Contains(name string) bool {
-	for i := 0; i < len(x.columns); i++ {
-        if x.columns[i].Name() == name {
+	for i := range x.Columns() {
+        if x.Columns()[i].Name() == name {
             return true;
 		}
 	}

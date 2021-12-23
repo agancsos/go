@@ -1,9 +1,8 @@
 package common
 import (
-    "io/ioutil"
     "net/http"
-    "encoding/json"
 	"bytes"
+	"io/ioutil"
 	"fmt"
 )
 
@@ -25,10 +24,10 @@ func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[s
     return nil;
 }
 
-func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string,  headers map[string]string) map[string]interface{} {
+func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
     body := StrDictionaryToJsonString(jsonBody)
 	var client = http.Client{};
-	req, err := http.NewRequest("POST", endpoint, bytes.NewReader([]byte(body)));
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(fmt.Sprintf("%s", body))));
 	for key, value := range headers {
         req.Header.Add(key, value);
     }
@@ -40,26 +39,13 @@ func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string,  he
     return nil;
 }
 
-func StrToDictionary(s []byte) map[string]interface{} {
-	var obj map[string]interface{};
-	json.Unmarshal(s, &obj);
-	return obj;
-}
-
-func DictionaryToJsonString (a map[string]interface{}) string {
-	var result = "{";
-	for key, value := range a {
-		result += fmt.Sprintf("\"%s\":\"%v\"", key, value);
+func EnsureRestMethod(a *http.Request, b string) (bool, string) {
+	if a == nil || a.Method != b {
+		return false, "";
 	}
-	result += "}";
-	return result;
-}
-
-func StrDictionaryToJsonString (a map[string]string) string {
-    var result = "{";
-    for key, value := range a {
-        result += fmt.Sprintf("\"%s\":\"%s\"", key, value);
-    }
-    result += "}";
-    return result;
+	var body, _ = ioutil.ReadAll(a.Body);
+	if b == "POST" && string(body) == "" {
+		return false, string(body);
+	}
+	return true, string(body);
 }
