@@ -6,11 +6,7 @@ import (
 	"fmt"
 )
 
-type RestHelper struct {
-	BasePath   string
-}
-
-func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[string]interface{} {
+func InvokeGet(endpoint string, headers map[string]string) map[string]interface{} {
 	var client = http.Client{};
 	req, err := http.NewRequest("GET", endpoint, nil);
 	for key, value := range headers {
@@ -24,7 +20,7 @@ func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[s
     return nil;
 }
 
-func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
+func InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
     body := StrDictionaryToJsonString(jsonBody)
 	var client = http.Client{};
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(fmt.Sprintf("%s", body))));

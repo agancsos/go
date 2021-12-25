@@ -6,11 +6,7 @@ import (
 	"fmt"
 )
 
-type RestHelper struct {
-	BasePath   string
-}
-
-func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[string]interface{} {
+func InvokeGet(endpoint string, headers map[string]string) map[string]interface{} {
 	var client = http.Client{};
 	req, err := http.NewRequest("GET", endpoint, nil);
 	for key, value := range headers {
@@ -24,7 +20,7 @@ func (a *RestHelper) InvokeGet(endpoint string, headers map[string]string) map[s
     return nil;
 }
 
-func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
+func InvokePost(endpoint string, jsonBody map[string]string, headers map[string]string) map[string]interface{} {
     body := StrDictionaryToJsonString(jsonBody)
 	var client = http.Client{};
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(fmt.Sprintf("%s", body))));
@@ -39,13 +35,13 @@ func (a *RestHelper) InvokePost(endpoint string, jsonBody map[string]string, hea
     return nil;
 }
 
-func EnsureRestMethod(a *http.Request, b string) bool {
+func EnsureRestMethod(a *http.Request, b string) (bool, string) {
 	if a == nil || a.Method != b {
-		return false;
+		return false, "";
 	}
 	var body, _ = ioutil.ReadAll(a.Body);
 	if b == "POST" && string(body) == "" {
-		return false;
+		return false, string(body);
 	}
-	return true;
+	return true, string(body);
 }

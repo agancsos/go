@@ -25,7 +25,6 @@ type TfsHelper struct {
 	Team       string
 	Endpoint   string
 	token      string
-	restHandle *common.RestHelper
 }
 
 // TfsHelper functions
@@ -34,9 +33,9 @@ func (x *TfsHelper) authenticate() string {
 }
 
 func (x *TfsHelper) GetWorkitem(a string, includeHistory bool) map[string]interface{} {
-	var rsp = x.restHandle.InvokeGet(fmt.Sprintf("%s/_apis/wit/workItems/%s", x.restHandle.BasePath, a), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
+	var rsp = common.InvokeGet(fmt.Sprintf("%s/_apis/wit/workItems/%s", common.BasePath, a), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
 	if includeHistory {
-		var rsp2 = x.restHandle.InvokeGet(fmt.Sprintf("%s/_apis/wit/workItems/%s/updates?api-version=3.1", x.restHandle.BasePath, a), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
+		var rsp2 = common.InvokeGet(fmt.Sprintf("%s/_apis/wit/workItems/%s/updates?api-version=3.1", common.BasePath, a), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
 		rsp["history"] = common.DictionaryToJsonString(rsp2);
 	}
 	return rsp;
@@ -44,7 +43,7 @@ func (x *TfsHelper) GetWorkitem(a string, includeHistory bool) map[string]interf
 
 func (x *TfsHelper) GetWorkitems(a string, includeHistory bool) []map[string]interface{} {
 	var result []map[string]interface{};
-	var rsp = x.restHandle.InvokePost(fmt.Sprintf("%s/%s/_apis/wit/wiql?api-version=1.0", x.restHandle.BasePath, x.Team), map[string]string{"query":a}, map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
+	var rsp = common.InvokePost(fmt.Sprintf("%s/%s/_apis/wit/wiql?api-version=1.0", common.BasePath, x.Team), map[string]string{"query":a}, map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
 	if rsp["workItems"] != nil {
 		for i := 0; i < len(rsp["workItems"].([]interface{})); i++ {
 			var wi = rsp["workItems"].([]interface{})[i];
@@ -56,7 +55,7 @@ func (x *TfsHelper) GetWorkitems(a string, includeHistory bool) []map[string]int
 
 func (x *TfsHelper) GetPullRequests() []map[string]interface{} {
 	var result  []map[string]interface{};
-	var rsp = x.restHandle.InvokeGet(fmt.Sprintf("%s/_apis/git/pullrequests?api-version=3.1", x.restHandle.BasePath), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
+	var rsp = common.InvokeGet(fmt.Sprintf("%s/_apis/git/pullrequests?api-version=3.1", common.BasePath), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
 	for i := 0; i < len(rsp["value"].([]interface{})); i++ {
 		result = append(result, rsp["value"].([]interface{})[i].(map[string]interface{}));
 	}
@@ -67,7 +66,7 @@ func (x *TfsHelper) GetPullRequestStories() []string {
 	var result []string;
 	var prs = x.GetPullRequests();
 	for _, pr := range  prs {
-		var rsp = x.restHandle.InvokeGet(fmt.Sprintf("%v/workitems", pr["url"]), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
+		var rsp = common.InvokeGet(fmt.Sprintf("%v/workitems", pr["url"]), map[string]string{"Authorization":fmt.Sprintf("Basic %s", x.token), "Content-Type":"application/json", "Accepts":"application/json"});
 		for i := 1; i < len(rsp["value"].([]interface{})); i++ {
 			var cursor = rsp["value"].([]interface{})[i].(map[string]interface{});
 			result = append(result, fmt.Sprintf("%v", cursor["id"]));
@@ -118,7 +117,6 @@ func (x *ScrumReport) Invoke(a *TfsHelper) {
 /********************************************************************************************/
 
 func (x *TfsHelper) Invoke(a string) {
-	x.restHandle = &common.RestHelper{BasePath: x.Endpoint};
 	x.token = x.authenticate();
 
 	var reportFound = false;
