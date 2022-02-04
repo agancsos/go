@@ -89,7 +89,6 @@ I look forward to hearing any feedback that might be shared.
 * Used Docker and Go (plus Python for tests) to implement their solution
 * Appropriately used HTTP verbs
 * Structured their JSON well
-* What could have gone better:
 
 ### What didn't go so well
 * The points balance can become negative (via submitting negative points to the crediting endpoint), and these negative points can be spent. This fails to meet the acceptance criteria.
