@@ -13,6 +13,7 @@ Build a REST service to manage credits given to a specific user from given payer
 * A database engine is not required.
 * The project must run on Windows, Linux, and macOS (assuming the dependencies are installed).
 * A GUI is not required.
+* The gin Go package is installed.
 
 ## Requirements
 * Users will be able to add credits to a repository.
@@ -95,6 +96,12 @@ I look forward to hearing any feedback that might be shared.
 * The project is poorly structured, with a single, large Golang file that acts as the server. The docs say they would structure their project differently, but the effort to do so upfront seems trivial with as much code as the provided.
 * Additionally, Gancsos used only the standard library to implement their solution. Sometimes, this is desirable, but their solution misses some important benefits of third parties that would improve their solution. In essence, they've reinvented the wheel but for seemingly no benefit.
 * Along with poor project structure, their Dockerfile is unnecessarily complex and bloated. I get the impression that candidate isn't well versed in Docker.
+
+### What I would have replied with in a PR
+* Thank you for raising this, although that's a good point, that's not what the sample expected results shows in the specifications.  During my testing, that -200 is required to get the expected balance.  Without it, the results of the spend call would be [-300, -200, -4500].  Regardless, I added an explicit check, but I still believe the sample was misleading.
+* Thank you for your feedback, the thought at the time was simplicity, not neccessarily lazziness and I didn't believe creating packages would be prudent.  Regardless, I restructured the code to better reflect what I would have pushed.
+* Thank you for your feedback. After looking into the gin package, I realized how much more of what I wanted to do could be done.  I will be using this in the future.
+* Thank you for your feedback. I added some configuration in the Docker file in the event a non-root user needed to get in.  Yes, this could depict bloat, but this doesn't neccessarily elude to lack of knowledge with Docker.  Regardless, I cleaned up the bloat. 
 
 ## References
 * https://go.dev/dl/
