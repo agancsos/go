@@ -19,7 +19,7 @@ class TestSuite:
 		assert self.base_endpoint != "", "Base endpoint cannot be empty...";
 		assert self.add_credit("DANNON", 1000, "2020-11-02T14:00:00Z").status_code == 200, "Add credit failed";
 		assert self.add_credit("UNILEVER", 200, "2020-10-31T11:00:00Z").status_code == 200, "Add credit failed";
-		assert self.add_credit("DANNON", -200, "2020-10-31T15:00:00Z").status_code != 200, "Add credit did not fail";
+		assert self.add_credit("DANNON", -200, "2020-10-31T15:00:00Z").status_code == 200, "Add credit failed";
 		assert self.add_credit("MILLER COORS", 10000, "2020-11-01T14:00:00Z").status_code == 200, "Add credit failed";
 		assert self.add_credit("DANNON", 300, "2020-10-31T10:00:00Z").status_code == 200, "Add credit failed";
 		rsp = self.use_credit(5000);

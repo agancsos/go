@@ -36,10 +36,6 @@ func addCredit(ctx *gin.Context) {
 		return;
 	}
 	json.Unmarshal(body, &transaction);
-	if transaction.Points < 0 {
-		ctx.JSON(http.StatusPreconditionRequired, gin.H{"result": fmt.Sprintf("Failed to add transaction.  Invalid points value of '%v'", transaction.Points)});
-		return;
-	}
 	repository.AddCredit(transaction);
 	ctx.JSON(http.StatusOK, gin.H{"result": "1"});
 }

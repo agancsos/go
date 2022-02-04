@@ -8,15 +8,16 @@ type Repository struct {
 }
 
 func (x *Repository) AddCredit(transaction *Transaction) {
-	for _, cursor := range x.Transactions() {
-		// Pay off any dues to the payer
-		if cursor.Payer == transaction.Payer && cursor.Points < 0 && transaction.Points >= cursor.Points {
-			var diff = transaction.Points - (transaction.Points + cursor.Points);
-			cursor.Points = cursor.Points + diff;
-			transaction.Points = transaction.Points - diff;
+	x.transactions = append(x.transactions, transaction);
+	for _, y := range x.Transactions() {
+		for _, z := range x.Transactions() {
+			if y.Payer == z.Payer && y.Points < 0 && z.Timestamp.Sub(y.Timestamp).Seconds() < 0.0 {
+				var diff = z.Points - (y.Points + z.Points);
+				y.Points += diff;
+				z.Points -= diff;
+			}
 		}
 	}
-	x.transactions = append(x.transactions, transaction);
 }
 
 func (x *Repository) Spend(points int) []*Credit {
@@ -25,6 +26,7 @@ func (x *Repository) Spend(points int) []*Credit {
 	for _, cursor := range x.Transactions() {
 		var diff = 0;
 		if points < 1 { break; }
+		if cursor.Points < 0 { continue; }
 		// Calculate balance
 		if cursor.Points > points {
 			diff = cursor.Points - (cursor.Points - points);
@@ -51,7 +53,7 @@ func (x *Repository) Balance() map[string]int {
 
 func (x *Repository) Transactions() []*Transaction {
 	sort.Slice(x.transactions, func(l int, r int) bool {
-		return x.transactions[r].Timestamp.Sub(x.transactions[l].Timestamp) > 0;
+		return x.transactions[l].Timestamp.Sub(x.transactions[r].Timestamp).Seconds() < 0.0;
 	});
 	return x.transactions;
 }
