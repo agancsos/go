@@ -76,7 +76,6 @@ func StrToStrPtr(a string) *string {
 	var result *string
 	temp := a;
 	result = &temp;
-	temp = "";
 	return result;
 }
 
