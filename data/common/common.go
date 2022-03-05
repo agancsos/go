@@ -46,13 +46,30 @@ func CStr(s string) *C.char {
 	return (*C.char)(unsafe.Pointer(h.Data))
 }
 
+func RunCmdNoWait(cmd string) {
+	args := strings.Fields(cmd);
+    var cmd2 = exec.Command(args[0], args[1:]...);
+	cmd2.Run();
+	cmd2.Process.Release();
+}
+
 func RunCmd(cmd string) string {
 	args := strings.Fields(cmd);
-	stdout, err := exec.Command(args[0], args[1:]...).Output();
-	if err != nil {
-		return fmt.Sprintf("%v", err);
+	var cmd2 = exec.Command(args[0], args[1:]...);
+	var pipe,_ = cmd2.StdoutPipe();
+	var stdout = make([]byte, 1024);
+	cmd2.Start();
+	pipe.Read(stdout)
+	cmd2.Process.Release();
+	return strings.Replace(string(stdout), "\x00", "", -1);
+}
+
+func ArgsToDictionary(a []string) map[string]string {
+	var result = map[string]string{};
+	for i := 0; i < len(a) - 1; i++ {
+		result[a[i]] = a[i + 1];
 	}
-	return string(stdout);
+	return result;
 }
 
 func StrToDictionary(s []byte) map[string]interface{} {
@@ -63,8 +80,12 @@ func StrToDictionary(s []byte) map[string]interface{} {
 
 func DictionaryToJsonString (a map[string]interface{}) string {
 	var result = "{";
+	var i = 0;
 	for key, value := range a {
-		result += fmt.Sprintf("\"%s\":\"%v\"", key, value);
+		if i > 0 { result += ","; }
+		var value2 = strings.Replace(fmt.Sprintf("%v", value), "\"", "\\\"", -1);
+		result += fmt.Sprintf("\"%s\":\"%v\"", key, value2);
+		i++;
 	}
 	result += "}";
 	return result;
@@ -84,4 +105,50 @@ func StrDictionaryToJsonString (a map[string]string) string {
 
 func ToConstStr(a string) *C.uchar {
 	return (*C.uchar)(unsafe.Pointer(&[]byte(a)[0]))
+}
+
+func StrToStrDictionary(s string) map[string]string {
+	var rawDict = StrToDictionary([]byte(s));
+	var result = map[string]string {};
+	for key, value := range rawDict {
+		result[key] = fmt.Sprintf("%v", value);
+	}
+	return result;
+}
+
+func DictionaryToStrDictionary(a map[string]interface{}) map[string]string {
+	var dict = map[string]string{};
+	for key, value := range a {
+		dict[key] = fmt.Sprintf("%v", value);
+	}
+	return dict;
+}
+
+func BoolToInt(a bool) int {
+	if a {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+func StrToStrPtr(a string) *string {
+	var result *string
+	temp := a;
+	result = &temp;
+	return result;
+}
+
+func IntToIntPtr(a int32) *int32 {
+	var result *int32;
+	temp := a;
+	result = &temp;
+	return result;
+}
+
+func BoolToBoolPtr(a bool) *bool {
+    var result *bool;
+    temp := a;
+    result = &temp;
+    return result;
 }

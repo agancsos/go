@@ -46,7 +46,7 @@ type TraceService struct {
 	FilePath    string
 	TraceLevel  int
 }
-func (x *TraceService) traceMessage(message string, level int, category int) {
+func (x TraceService) traceMessage(message string, level int, category int) {
     if x.TraceLevel >= level {
 		var file, _ = os.OpenFile(x.FilePath, os.O_APPEND|os.O_WRONLY, 0644);
 		file.WriteString(fmt.Sprintf("\n%v | %s | %s",
@@ -57,23 +57,23 @@ func (x *TraceService) traceMessage(message string, level int, category int) {
     }
 }
 
-func (x *TraceService) TraceError(message string, category int) {
+func (x TraceService) TraceError(message string, category int) {
     x.traceMessage(message, int(TL_ERROR), category);
 }
 
-func (x *TraceService) TraceWarning(message string, category int) {
+func (x TraceService) TraceWarning(message string, category int) {
     x.traceMessage(message, int(TL_WARNING), category);
 }
 
-func (x *TraceService) TraceInformational(message string, category int) {
+func (x TraceService) TraceInformational(message string, category int) {
     x.traceMessage(message, int(TL_INFORMATIONAL), category);
 }
 
-func (x *TraceService) TraceVerbose(message string, category int) {
+func (x TraceService) TraceVerbose(message string, category int) {
 	x.traceMessage(message, int(TL_VERBOSE), category);
 }
 
-func (x *TraceService) TraceDebug(message string, category int) {
+func (x TraceService) TraceDebug(message string, category int) {
     x.traceMessage(message, int(TL_DEBUG), category);
 }
 /*****************************************************************************/

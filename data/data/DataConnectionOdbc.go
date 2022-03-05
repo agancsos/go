@@ -54,7 +54,7 @@ func (x *DataConnectionOdbc) Query(a string) *DataTable {
                 tempColumn.SetName(columns[col]);
                 x.check(C.SQLGetData(statement, C.ushort(col + 1), C.SQL_C_CHAR, C.SQLPOINTER(&data[0]), 400000, &dataLen), "Get data");
                 var dataValue = string(data);
-				tempColumn.SetValue(common.CleanString(dataValue));
+                tempColumn.SetValue(common.CleanString(dataValue));
                 tempRow.AddColumn(tempColumn);
             }
             result.AddRow(tempRow);

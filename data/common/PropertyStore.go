@@ -25,8 +25,8 @@ func (x *PropertyStoreService) LoadFromFile(a string, b PropertyStore) {
 type EmptyPropertyStore struct{
 	properties     map[string]interface{}
 }
-func (x *EmptyPropertyStore) GetKeys()map[string]interface{} { return x.properties; }
-func (x *EmptyPropertyStore) GetKey(a string) interface{} { return x.properties[a]; }
+func (x EmptyPropertyStore) GetKeys()map[string]interface{} { return x.properties; }
+func (x EmptyPropertyStore) GetKey(a string) interface{} { return x.properties[a]; }
 func (x *EmptyPropertyStore) SetProperty(a string, b interface{}) { x.properties[a] = b}
 func (x *EmptyPropertyStore) load(a string) {}
 /******************************************************************************/
@@ -35,8 +35,8 @@ func (x *EmptyPropertyStore) load(a string) {}
 type JsonPropertyStore struct{
     properties     map[string]interface{}
 }
-func (x *JsonPropertyStore) GetKeys()map[string]interface{} { return x.properties; }
-func (x *JsonPropertyStore) GetKey(a string) interface{} { return x.properties[a]; }
+func (x JsonPropertyStore) GetKeys()map[string]interface{} { return x.properties; }
+func (x JsonPropertyStore) GetKey(a string) interface{} { return x.properties[a]; }
 func (x *JsonPropertyStore) SetProperty(a string, b interface{}) { x.properties[a] = b; }
 func (x *JsonPropertyStore) load(a string) {
 	var b = StrToDictionary([]byte(a));
@@ -51,8 +51,8 @@ type PlainPropertyStore struct{
     properties     map[string]interface{}
 	Delimiter      string
 }
-func (x *PlainPropertyStore) GetKeys()map[string]interface{} { return x.properties; }
-func (x *PlainPropertyStore) GetKey(a string) interface{} { return x.properties[a]; }
+func (x PlainPropertyStore) GetKeys()map[string]interface{} { return x.properties; }
+func (x PlainPropertyStore) GetKey(a string) interface{} { return x.properties[a]; }
 func (x *PlainPropertyStore) SetProperty(a string, b interface{}) { x.properties[a] = b; }
 func (x *PlainPropertyStore) load(a string) {
 	if x.Delimiter == "" { x.Delimiter = ","; }
