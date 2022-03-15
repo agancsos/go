@@ -1,5 +1,7 @@
 # Abel Gancsos DigitalOcean Project
 
+![Alt ""](https://logonoid.com/images/digitalocean-logo.png "DigitalOcean")
+
 ## Synopsis
 Abel Gancsos DigitalOcean Project, agdo for short, also known as the binary, is a package management system written in Go, but isn't specific to the Go programming language.  The system is made up of two components, the REST service and the CLI.
 
