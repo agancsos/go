@@ -144,12 +144,6 @@ I would like to thank you again for your time to discuss my background and exper
 ## Disclaimer
 As I didn't get past the Hiring Manager Screen (no fault, just not the right role), I didn't get a chance to actually provide my solution.  I am posting the code purely for education purposes and due to the time spent on preparing this project.
 
-## References
-The following referenced were used to help build some of the aspects of this tool.  Although slightly rewritten to match the style, they are still close enough where I can't take all the credit.
-* https://gist.github.com/mattetti/5914158/f4d1393d83ebedc682a3c8e7bdc6b49670083b84
-* https://tutorialedge.net/golang/go-file-upload-tutorial/
-* https://github.com/agancsos/go/tree/main/testsuite/common
-
 ## Retrospective
 * The main thing I would change is the implementation of the API.  For scaling purposes, I would use gRPC instead of REST to take advantage of the performance improvements in HTTP/2.
 * I would also add a SQLite database file to hold the repository manifests, so that instead of walking the file system, I can retrieve everything at once with a lightwight query.
@@ -158,4 +152,8 @@ The following referenced were used to help build some of the aspects of this too
 * If the source was put out in a PR, I'm sure feedback would include adding a generic error handler, which I agree with.
 * The install operation supports only 1 package at a time, I would change the implementation to support multiple.
 
-
+## References
+The following referenced were used to help build some of the aspects of this tool.  Although slightly rewritten to match the style, they are still close enough where I can't take all the credit.
+* https://gist.github.com/mattetti/5914158/f4d1393d83ebedc682a3c8e7bdc6b49670083b84
+* https://tutorialedge.net/golang/go-file-upload-tutorial/
+* https://github.com/agancsos/go/tree/main/testsuite/common
