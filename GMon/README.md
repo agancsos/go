@@ -85,7 +85,7 @@ A Chef Cookbook is being provided to demonstrate knowledge of Chef software as w
 3. Compiles the source and runs the Unit Tests via the compile.py script.
 4. Removes the project directory.
 
-## References
-
 ## Retrospective
+
+## References
 
