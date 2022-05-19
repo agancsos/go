@@ -14,7 +14,7 @@ func contains(list []string, needle string) bool {
 
 func GetJobs(client *JenkinsClient, path string, includeList []string, excludeList []string, recursive bool) ([]map[string]interface{}) {
 	var result      = []map[string]interface{}{};
-	var jobs, err   = client.JenkinsRequest(path);
+	var jobs, err   = client.JenkinsRequest(path, map[string]string{});
 	if err == nil {
 		var jobs2 = jobs["jobs"].([]interface{});
 		for _, job := range jobs2 {
@@ -36,7 +36,7 @@ func GetJobs(client *JenkinsClient, path string, includeList []string, excludeLi
 }
 
 func GetLastBuild(client *JenkinsClient, job map[string]interface{}) (map[string]interface{}, error) {
-	return client.JenkinsRequest(fmt.Sprintf("%s/lastBuild", job["url"].(string)));
+	return client.JenkinsRequest(fmt.Sprintf("%s/lastBuild", job["url"].(string)), map[string]string{});
 }
 
 func FindActions(actions map[string]interface{}, className string) interface{} {
@@ -52,5 +52,5 @@ func GetLogOutput(client *JenkinsClient, job map[string]interface{}, build int) 
 		if err != nil { return "", err; }
 		build, _ = strconv.Atoi(fmt.Sprintf("%v", lastBuild["id"]));
 	}
-	return client.RawRequest(fmt.Sprintf("%s/%d/consoleText", job["url"].(string), build));
+	return client.RawRequest(fmt.Sprintf("%s/%d/consoleText", job["url"].(string), build), map[string]string{});
 }
