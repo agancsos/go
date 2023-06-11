@@ -84,6 +84,9 @@ func main() {
 			if j > 0 { print(fmt.Sprintf("\033[36m%s\033[m", outputDelim)); }
 			print(fmt.Sprintf("\033[36m%s\033[m", row.Column(column).Value()));
 		}
+		if format == "MD" {
+			print(fmt.Sprintf("\033[36m%s\033[m", row.Column(column).Value()));
+		}
 	}
 	println();
 	os.Exit(0);
