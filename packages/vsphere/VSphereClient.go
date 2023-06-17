@@ -61,9 +61,9 @@ func (x *VSphereClient) authenticate() error {
 	if err != nil { return err; }
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", encoded));
 	rsp, err := client.Do(req);
-	if err != nil { return nil; }
+	if err != nil { return err; }
 	rspData, err := ioutil.ReadAll(rsp.Body);
-	if err != nil { return err}
+	if err != nil { return err; }
 	x.sessionId = string(rspData);
 	return nil;
 }
@@ -98,7 +98,7 @@ func (x VSphereClient) RawPostRequest(method string, endpoint string, headers ma
 	rsp, err := client.Do(req);
 	if err != nil { return nil, map[string]interface{}{}; }
 	rspData, err := ioutil.ReadAll(rsp.Body);
-	if err != nil { return err, map[string]interface{}{}}
+	if err != nil { return err, map[string]interface{}{}; }
 	var jobj map[string]interface{};
 	err = json.Unmarshal(rspData, &jobj);
 }
