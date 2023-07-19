@@ -13,15 +13,15 @@ type HerculesClient struct {
 }
 
 func DictionaryToJsonString (a map[string]interface{}) string {
-	var result = "";
-	var i = 0;
-	for key, value := range a {
-		if i > 0 { result += "*"; }
-		result += fmt.Sprintf("\"%s\"=\"%v\"", key, value);
-		i += 1;
-	}
-	result += "";
-	return result;
+    var result = "";
+    var i = 0;
+    for key, value := range a {
+        if i > 0 { result += "&"; }
+        result += fmt.Sprintf("%s=%s", key, url.QueryEscape(fmt.Sprintf("%v", value)));
+        i += 1;
+    }
+    result += "";
+    return result;
 }
 
 func NewClient(baseEndpoint string) (*HerculesClient, error) {
