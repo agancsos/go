@@ -64,7 +64,7 @@ func (x *VSphereClient) authenticate() error {
 	if err != nil { return err; }
 	rspData, err := ioutil.ReadAll(rsp.Body);
 	if err != nil { return err; }
-	x.sessionId = string(rspData);
+	x.sessionId = strings.Replace(string(rspData), "\"", "", -1);
 	return nil;
 }
 
